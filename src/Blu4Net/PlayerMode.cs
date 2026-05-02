@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Blu4Net
+﻿namespace Blu4Net
 {
     public enum ShuffleMode
     {
