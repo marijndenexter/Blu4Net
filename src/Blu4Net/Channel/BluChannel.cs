@@ -284,12 +284,22 @@ namespace Blu4Net.Channel
 
         public async Task<SkipResponse> Skip()
         {
-            return await SendRequest<SkipResponse>("Skip").ConfigureAwait(false);
+            var document = await SendRequest("Skip").ConfigureAwait(false);
+            if (document.Root.Name == "id")
+            {
+                return document.Deserialize<SkipResponse>();
+            }
+            return null;
         }
 
         public async Task<BackResponse> Back()
         {
-            return await SendRequest<BackResponse>("Back").ConfigureAwait(false);
+            var document = await SendRequest("Back").ConfigureAwait(false);
+            if (document.Root.Name == "id")
+            {
+                return document.Deserialize<BackResponse>();
+            }
+            return null;
         }
 
         public async Task<VolumeResponse> GetVolume()
