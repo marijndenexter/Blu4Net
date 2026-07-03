@@ -13,4 +13,8 @@
     <PackageReference Include="Zeroconf" Version="3.6.11" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="HiFiControl.Tests" />
+  </ItemGroup>
+
 </Project>

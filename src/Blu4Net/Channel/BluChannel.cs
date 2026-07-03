@@ -100,6 +100,24 @@ namespace Blu4Net.Channel
             }
         }
 
+        // Some entries (notably physical/Capture inputs on multi-input products such as Bluesound
+        // Professional amplifiers) embed a second, literal '?' inside the query value itself, e.g.
+        // /Play?url=Capture:hw:soundchassis,0/1/25/2?id=xdynamic-Source1, so splitting a path 
+        // and query will need to take this into account.
+        internal static (string Path, string Query) SplitPathAndQuery(string url)
+        {
+            if (url == null)
+                throw new ArgumentNullException(nameof(url));
+
+            var queryIndex = url.IndexOf('?');
+            if (queryIndex < 0)
+            {
+                return (url, string.Empty);
+            }
+
+            return (url.Substring(0, queryIndex), url.Substring(queryIndex + 1));
+        }
+
         private Task<XDocument> SendRequest(string request, NameValueCollection parameters = null)
         {
             if (request == null)
@@ -481,10 +499,10 @@ namespace Blu4Net.Channel
 
         public async Task<LoadedResponse> PlayURL(string playURL)
         {
-            var parts = playURL.Split(new char[] { '?' });
-            var parameters = HttpUtility.ParseQueryString(parts[1]);
+            var (path, query) = SplitPathAndQuery(playURL);
+            var parameters = HttpUtility.ParseQueryString(query);
 
-            var document = await SendRequest(parts[0], parameters).ConfigureAwait(false);
+            var document = await SendRequest(path, parameters).ConfigureAwait(false);
             if (document.Root.Name == "loaded")
             {
                 return document.Deserialize<PlaylistLoadedResponse>();
@@ -506,10 +524,10 @@ namespace Blu4Net.Channel
 
         public async Task<ActionResponse> ActionURL(string actionURL)
         {
-            var parts = actionURL.Split(new char[] { '?' });
-            var parameters = HttpUtility.ParseQueryString(parts[1]);
+            var (path, query) = SplitPathAndQuery(actionURL);
+            var parameters = HttpUtility.ParseQueryString(query);
 
-            var document = await SendRequest(parts[0], parameters).ConfigureAwait(false);
+            var document = await SendRequest(path, parameters).ConfigureAwait(false);
             if (document.Root.Name == "response")
             {
                 return document.Deserialize<NotificationActionResponse>();
