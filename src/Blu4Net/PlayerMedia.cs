@@ -14,6 +14,7 @@ namespace Blu4Net
         public string ServiceName { get; }
         public string Quality { get; }
         public string StreamFormat { get; }
+        public string StreamUrl { get; }
         public bool CanSeek { get; }
         public PlayerState PlayerState { get; }
 
@@ -38,6 +39,7 @@ namespace Blu4Net
             ServiceName = response.Service;
             Quality = response.Quality;
             StreamFormat = response.StreamFormat;
+            StreamUrl = response.StreamUrl;
             Song = response.Song;
             SongID = response.SongID;
             ArtistID = response.ArtistID;
