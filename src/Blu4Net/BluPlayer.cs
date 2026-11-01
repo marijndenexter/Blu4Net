@@ -1,4 +1,4 @@
-﻿using Blu4Net.Channel;
+using Blu4Net.Channel;
 using System;
 using System.Globalization;
 using System.IO;
@@ -90,7 +90,10 @@ namespace Blu4Net
                 .Select(response => new GroupingState(response));
         }
 
-        public static async Task<BluPlayer> Connect(Uri endpoint, CultureInfo acceptLanguage = null)
+        public static Task<BluPlayer> Connect(Uri endpoint, CultureInfo acceptLanguage = null) =>
+            Connect(endpoint, acceptLanguage, CancellationToken.None);
+
+        public static async Task<BluPlayer> Connect(Uri endpoint, CultureInfo acceptLanguage, CancellationToken cancellationToken)
         {
             if (endpoint == null)
                 throw new ArgumentNullException(nameof(endpoint));
@@ -101,9 +104,9 @@ namespace Blu4Net
             }
 
             var channel = new BluChannel(endpoint, acceptLanguage);
-            var syncStatus = await channel.GetSyncStatus().ConfigureAwait(false);
-            var status = await channel.GetStatus().ConfigureAwait(false);
-            var content = await channel.BrowseContent().ConfigureAwait(false);
+            var syncStatus = await channel.GetSyncStatus(cancellationToken).ConfigureAwait(false);
+            var status = await channel.GetStatus(cancellationToken).ConfigureAwait(false);
+            var content = await channel.BrowseContent(cancellationToken: cancellationToken).ConfigureAwait(false);
 
             return new BluPlayer(channel, syncStatus, status, content);
         }
@@ -137,6 +140,9 @@ namespace Blu4Net
             var response = await _channel.GetStatus().ConfigureAwait(false);
             return response.InputId;
         }
+
+        public Task<StatusResponse> ReadStatusAsync(CancellationToken cancellationToken) =>
+            _channel.GetStatus(cancellationToken);
         
         public async Task<Volume> GetVolume()
         {
