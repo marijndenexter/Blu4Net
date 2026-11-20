@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
@@ -190,14 +190,14 @@ namespace Blu4Net.Channel
         }
 
 
-        public async Task<StatusResponse> GetStatus()
+        public async Task<StatusResponse> GetStatus(CancellationToken cancellationToken = default)
         {
-            return await SendRequest<StatusResponse>("Status").ConfigureAwait(false);
+            return await SendRequest<StatusResponse>("Status", null, Timeout, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<SyncStatusResponse> GetSyncStatus()
+        public async Task<SyncStatusResponse> GetSyncStatus(CancellationToken cancellationToken = default)
         {
-            return await SendRequest<SyncStatusResponse>("SyncStatus").ConfigureAwait(false);
+            return await SendRequest<SyncStatusResponse>("SyncStatus", null, Timeout, cancellationToken).ConfigureAwait(false);
         }
 
         public Task<PlayResponse> Play()
@@ -555,7 +555,7 @@ namespace Blu4Net.Channel
             throw new InvalidDataException();
         }
 
-        public async Task<BrowseContentResponse> BrowseContent(string key = null, string query = null)
+        public async Task<BrowseContentResponse> BrowseContent(string key = null, string query = null, CancellationToken cancellationToken = default)
         {
             var parameters = HttpUtility.ParseQueryString(string.Empty);
             if (key != null)
@@ -568,7 +568,7 @@ namespace Blu4Net.Channel
                 }
             }
 
-            var response = await SendRequest<BrowseContentResponse>("Browse", parameters).ConfigureAwait(false);
+            var response = await SendRequest<BrowseContentResponse>("Browse", parameters, Timeout, cancellationToken).ConfigureAwait(false);
             if (response.Items == null)
             {
                 response.Items = new BrowseContentResponse.Item[0];
